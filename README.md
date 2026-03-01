@@ -72,7 +72,7 @@ NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_api_key
 ```
 Production URL:
 ```bash
-https://netflix-clone-web.vercel.app
+https://netflix-clone-web-nu.vercel.app
 ```
 ## 🔐 Environment Variables
 | Name                     | Description  |
