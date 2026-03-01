@@ -1,60 +1,46 @@
-import { fetchMovies } from "@/lib/tmdb"
-import { Movie } from "@/types/movie"
-import Link from "next/link"
+import { notFound } from "next/navigation"
+import { fetchMovieById, fetchMovieVideos } from "@/lib/tmdb"
+import VideoPlayer from "@/components/player/VideoPlayer"
+import type { Metadata } from "next"
 
 interface PlayerPageProps {
-  params: {
-    id: string
+  params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({
+  params,
+}: PlayerPageProps): Promise<Metadata> {
+  const { id } = await params
+  try {
+    const movie = await fetchMovieById(id)
+    return { title: `${movie.title} - Netflix Clone` }
+  } catch {
+    return { title: "Movie Not Found" }
   }
 }
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
-  const data = await fetchMovies("/movie/popular")
+  const { id } = await params
 
-  const movie = data.results.find(
-    (m: Movie) => m.id.toString() === params.id
-  )
-
-  if (!movie) {
-    return (
-      <div className="bg-black text-white min-h-screen flex items-center justify-center">
-        Movie not found
-      </div>
-    )
+  const numericId = parseInt(id, 10)
+  if (!Number.isFinite(numericId) || numericId <= 0) {
+    notFound()
   }
 
-  const imageUrl = movie.backdrop_path
-    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
-    : ""
+  try {
+    const [movie, videos] = await Promise.all([
+      fetchMovieById(id),
+      fetchMovieVideos(id),
+    ])
 
-  return (
-    <div className="bg-black min-h-screen text-white">
-      
-      {/* 상단 뒤로가기 */}
-      <div className="p-6">
-        <Link href="/" className="text-lg hover:underline">
-          ← Back
-        </Link>
-      </div>
-
-      {/* 배경 이미지 영역 */}
-      <div
-        className="relative h-[60vh] bg-cover bg-center"
-        style={{ backgroundImage: `url(${imageUrl})` }}
-      >
-        <div className="absolute inset-0 bg-black/60 flex items-end">
-          <h1 className="text-5xl font-bold p-10">
-            {movie.title || movie.name}
-          </h1>
-        </div>
-      </div>
-
-      {/* 플레이어 영역 자리 */}
-      <div className="p-10">
-        <div className="bg-zinc-800 h-96 rounded-lg flex items-center justify-center text-gray-400">
-          🎬 Video Player Area (팀원이 구현 예정)
-        </div>
-      </div>
-    </div>
-  )
+    return (
+      <VideoPlayer
+        title={movie.title}
+        backdropPath={movie.backdrop_path}
+        videos={videos.results}
+      />
+    )
+  } catch {
+    notFound()
+  }
 }

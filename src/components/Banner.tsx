@@ -1,29 +1,21 @@
-"use client"
+"use client";
 
-import { Movie } from "@/types/movie"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import Modal from "./Modal"
+import { Movie } from "@/types/movie";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Modal from "./Modal";
 
 interface BannerProps {
-  movies: Movie[]
+  movie: Movie;
 }
 
-export default function Banner({ movies }: BannerProps) {
-  const router = useRouter()
-  const [isOpen, setIsOpen] = useState(false)
-
-  const [movie] = useState<Movie | null>(() => {
-    if (!movies.length) return null
-    const index = Math.floor(Math.random() * movies.length)
-    return movies[index]
-  })
-
-  if (!movie) return null
+export default function Banner({ movie }: BannerProps) {
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
 
   const imageUrl = movie.backdrop_path
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
-    : ""
+    : "";
 
   return (
     <>
@@ -62,9 +54,7 @@ export default function Banner({ movies }: BannerProps) {
         </div>
       </header>
 
-      {isOpen && (
-        <Modal movie={movie} onClose={() => setIsOpen(false)} />
-      )}
+      {isOpen && <Modal movie={movie} onClose={() => setIsOpen(false)} />}
     </>
-  )
+  );
 }
