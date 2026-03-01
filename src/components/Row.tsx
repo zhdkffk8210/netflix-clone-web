@@ -1,8 +1,8 @@
 "use client"
 
 import { useRef } from "react"
-import { Movie } from "@/types/movie"
 import MovieCard from "./MovieCard"
+import { Movie } from "@/types/movie"
 
 interface RowProps {
   title: string
@@ -15,71 +15,52 @@ export default function Row({ title, movies }: RowProps) {
   const scroll = (direction: "left" | "right") => {
     if (!rowRef.current) return
 
-    const { scrollLeft, clientWidth, scrollWidth } = rowRef.current
+    const scrollAmount = rowRef.current.clientWidth * 0.9
 
-    const scrollAmount = clientWidth
-
-    if (direction === "right") {
-      const newScrollLeft = scrollLeft + scrollAmount
-
-      if (newScrollLeft >= scrollWidth - clientWidth) {
-        // 끝이면 처음으로
-        rowRef.current.scrollTo({
-          left: 0,
-          behavior: "smooth",
-        })
-      } else {
-        rowRef.current.scrollTo({
-          left: newScrollLeft,
-          behavior: "smooth",
-        })
-      }
+    if (direction === "left") {
+      rowRef.current.scrollBy({
+        left: -scrollAmount,
+        behavior: "smooth",
+      })
     } else {
-      const newScrollLeft = scrollLeft - scrollAmount
-
-      if (newScrollLeft <= 0) {
-        // 처음이면 끝으로
-        rowRef.current.scrollTo({
-          left: scrollWidth,
-          behavior: "smooth",
-        })
-      } else {
-        rowRef.current.scrollTo({
-          left: newScrollLeft,
-          behavior: "smooth",
-        })
-      }
+      rowRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: "smooth",
+      })
     }
   }
 
   return (
-    <div className="text-white mb-8">
-      <h2 className="text-xl font-bold mb-2 px-4">{title}</h2>
+    <div className="relative group mb-8">
+      <h2 className="text-white text-xl font-semibold mb-3 px-4">
+        {title}
+      </h2>
 
-      <div className="relative group">
-        <button
-          onClick={() => scroll("left")}
-          className="absolute left-0 top-0 bottom-0 z-10 hidden group-hover:flex items-center bg-black/50 px-2"
-        >
-          ◀
-        </button>
+      {/* Left Button */}
+      <button
+        onClick={() => scroll("left")}
+        className="absolute left-0 top-0 bottom-0 z-10 hidden group-hover:flex items-center bg-black/60 px-3 text-white text-3xl hover:bg-black/80 transition"
+      >
+        ‹
+      </button>
 
-        <div
-          ref={rowRef}
-          className="flex overflow-x-scroll scrollbar-hide space-x-4 px-4"
-        >
-          {movies.map((movie) => (
-            <MovieCard key={movie.id} movie={movie} />
-          ))}
-        </div>
-
-        <button
-          onClick={() => scroll("right")}
-          className="absolute right-0 top-0 bottom-0 z-10 hidden group-hover:flex items-center bg-black/50 px-2"
-        >
-          ▶
-        </button>
+      {/* Movie List */}
+      <div
+        ref={rowRef}
+        className="flex overflow-x-scroll scrollbar-hide space-x-4 px-4 scroll-smooth"
+      >
+        {movies.map((movie) => (
+          <MovieCard key={movie.id} movie={movie} />
+        ))}
       </div>
+
+      {/* Right Button */}
+      <button
+        onClick={() => scroll("right")}
+        className="absolute right-0 top-0 bottom-0 z-10 hidden group-hover:flex items-center bg-black/60 px-3 text-white text-3xl hover:bg-black/80 transition"
+      >
+        ›
+      </button>
     </div>
   )
 }

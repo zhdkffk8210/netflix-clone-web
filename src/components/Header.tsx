@@ -42,7 +42,7 @@ export default function Header() {
         </h1>
 
         {/* Profile Box */}
-        <div className="w-8 h-8 bg-gray-400 rounded-sm cursor-pointer hover:scale-110 transition" />
+        <div className="w-8 h-8 rounded-md bg-gradient-to-br from-red-500 to-yellow-500 cursor-pointer hover:scale-110 transition" />
       </div>
     </header>
   )
